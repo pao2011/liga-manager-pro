@@ -1018,6 +1018,409 @@
   @keyframes scKick{0%{transform:translateY(18px) rotate(0deg) scale(.96);opacity:0}35%{transform:translateY(0) rotate(-3deg) scale(1)}55%{transform:translateY(-2px) rotate(8deg) scale(1.03)}100%{transform:translateY(0) rotate(0) scale(1);opacity:1}}
   @keyframes scHit{0%{filter:brightness(1);transform:scale(1)}45%{filter:brightness(2.4);transform:scale(1.18)}100%{filter:brightness(1);transform:scale(1)}}
   @media(prefers-reduced-motion:reduce){.shot-cinema *{animation:none!important}}
+
+  /* =====================================================================
+     v11 · Glass UI — glassmorphism, fondo aurora y animaciones suaves
+     Esta capa va al final para pisar estilos anteriores sin tocarlos.
+     ===================================================================== */
+  :root{
+    --bg:#E9F3EE; --surface:rgba(255,255,255,.64); --surface-2:rgba(16,58,38,.06); --surface-solid:#FFFFFF;
+    --border:rgba(16,35,28,.10); --shadow:rgba(16,35,28,.10);
+    --glass-bg:linear-gradient(135deg, rgba(255,255,255,.78), rgba(255,255,255,.50));
+    --glass-strong:linear-gradient(160deg, rgba(255,255,255,.92), rgba(246,252,248,.80));
+    --glass-edge:rgba(255,255,255,.85);
+    --glass-hi:inset 0 1px 0 rgba(255,255,255,.9);
+    --glass-shadow:0 10px 30px -12px rgba(16,58,38,.22), 0 2px 6px -2px rgba(16,58,38,.08);
+    --glass-blur:blur(18px) saturate(170%);
+    --grad-primary:linear-gradient(135deg,#22B06A 0%,#147A4A 100%);
+    --grad-gold:linear-gradient(135deg,#F3CF6A 0%,#C6941B 100%);
+    --glow-primary:0 10px 24px -8px rgba(26,150,90,.6);
+    --aurora-1:rgba(52,211,140,.42); --aurora-2:rgba(56,189,248,.30); --aurora-3:rgba(244,196,72,.32);
+    --ease-out:cubic-bezier(.22,1,.36,1); --ease-spring:cubic-bezier(.34,1.56,.64,1);
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg:#06130D; --surface:rgba(255,255,255,.065); --surface-2:rgba(255,255,255,.07); --surface-solid:#11271D;
+      --border:rgba(255,255,255,.10); --shadow:rgba(0,0,0,.45);
+      --glass-bg:linear-gradient(135deg, rgba(255,255,255,.10), rgba(255,255,255,.035));
+      --glass-strong:linear-gradient(160deg, rgba(22,46,34,.92), rgba(10,26,19,.86));
+      --glass-edge:rgba(255,255,255,.12);
+      --glass-hi:inset 0 1px 0 rgba(255,255,255,.10);
+      --glass-shadow:0 14px 36px -14px rgba(0,0,0,.7), 0 2px 8px -2px rgba(0,0,0,.4);
+      --grad-primary:linear-gradient(135deg,#2FC07B 0%,#167E50 100%);
+      --glow-primary:0 10px 26px -8px rgba(47,192,123,.55);
+      --aurora-1:rgba(34,197,120,.26); --aurora-2:rgba(37,99,235,.20); --aurora-3:rgba(168,85,247,.14);
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#06130D; --surface:rgba(255,255,255,.065); --surface-2:rgba(255,255,255,.07); --surface-solid:#11271D;
+    --border:rgba(255,255,255,.10); --shadow:rgba(0,0,0,.45);
+    --glass-bg:linear-gradient(135deg, rgba(255,255,255,.10), rgba(255,255,255,.035));
+    --glass-strong:linear-gradient(160deg, rgba(22,46,34,.92), rgba(10,26,19,.86));
+    --glass-edge:rgba(255,255,255,.12);
+    --glass-hi:inset 0 1px 0 rgba(255,255,255,.10);
+    --glass-shadow:0 14px 36px -14px rgba(0,0,0,.7), 0 2px 8px -2px rgba(0,0,0,.4);
+    --grad-primary:linear-gradient(135deg,#2FC07B 0%,#167E50 100%);
+    --glow-primary:0 10px 26px -8px rgba(47,192,123,.55);
+    --aurora-1:rgba(34,197,120,.26); --aurora-2:rgba(37,99,235,.20); --aurora-3:rgba(168,85,247,.14);
+  }
+
+  /* ---------- Fondo aurora animado ---------- */
+  body{ background:var(--bg); }
+  #shell{ background:transparent; z-index:1; }
+  #bgFx{ position:fixed; inset:0; z-index:0; overflow:hidden; pointer-events:none; }
+  #bgFx i{ position:absolute; width:75vmax; height:75vmax; border-radius:50%; will-change:transform; }
+  #bgFx .b1{ left:-30vmax; top:-28vmax; background:radial-gradient(circle, var(--aurora-1), transparent 62%); animation:aurora1 26s ease-in-out infinite alternate; }
+  #bgFx .b2{ right:-34vmax; top:12vh; background:radial-gradient(circle, var(--aurora-2), transparent 62%); animation:aurora2 32s ease-in-out infinite alternate; }
+  #bgFx .b3{ left:-12vmax; bottom:-40vmax; background:radial-gradient(circle, var(--aurora-3), transparent 62%); animation:aurora3 38s ease-in-out infinite alternate; }
+  #bgFx .pitch-lines{ position:absolute; left:50%; top:50%; width:min(140vw,900px); aspect-ratio:1; transform:translate(-50%,-50%); border-radius:50%;
+    border:1.5px solid color-mix(in srgb, var(--text) 5%, transparent); opacity:.9; }
+  #bgFx .pitch-lines::before{ content:''; position:absolute; left:50%; top:-100vh; bottom:-100vh; width:1.5px; background:color-mix(in srgb, var(--text) 5%, transparent); }
+  #bgFx .pitch-lines::after{ content:''; position:absolute; left:50%; top:50%; width:10px; height:10px; margin:-5px; border-radius:50%; background:color-mix(in srgb, var(--text) 7%, transparent); }
+  @keyframes aurora1{ 0%{ transform:translate(0,0) scale(1);} 50%{ transform:translate(18vw,12vh) scale(1.15);} 100%{ transform:translate(6vw,26vh) scale(.95);} }
+  @keyframes aurora2{ 0%{ transform:translate(0,0) scale(1);} 50%{ transform:translate(-16vw,20vh) scale(.9);} 100%{ transform:translate(-6vw,-8vh) scale(1.12);} }
+  @keyframes aurora3{ 0%{ transform:translate(0,0) scale(1.05);} 50%{ transform:translate(20vw,-14vh) scale(.92);} 100%{ transform:translate(30vw,-4vh) scale(1.1);} }
+
+  /* ---------- Superficies de vidrio ---------- */
+  .card, .match-card, .form-sec, .bracket-match, .award-card, .divi-editor, .stadium-preview, .venue-card,
+  .motm-card, .ls-box, .commentary, .pred-line, .finance-card, .h2h div, .ps-career div, .ps-meters > div,
+  .spark-box, .team-chip, .issue-box{
+    background:var(--glass-bg); border:1px solid var(--glass-edge);
+    box-shadow:var(--glass-shadow), var(--glass-hi);
+    -webkit-backdrop-filter:var(--glass-blur); backdrop-filter:var(--glass-blur);
+  }
+  .card, .match-card, .bracket-match{ border-radius:18px; }
+  .form-sec, .divi-editor{ border-radius:20px; }
+  .issue-box{ background:linear-gradient(135deg, rgba(214,41,58,.16), rgba(214,41,58,.06)); border-color:color-mix(in srgb, var(--danger) 55%, transparent); }
+  .team-chip.on{ background:linear-gradient(135deg, color-mix(in srgb, var(--accent) 22%, transparent), color-mix(in srgb, var(--accent) 8%, transparent)); border-color:var(--accent); }
+  .h2h div, .ps-career div, .ps-meters > div{ border-radius:14px; }
+  .sim-loader-pitch::before{ background:var(--surface-solid); }
+  .tag-liga{ background:color-mix(in srgb, var(--accent) 16%, transparent) !important; }
+  .tag-elim{ background:color-mix(in srgb, var(--warn) 18%, transparent) !important; }
+
+  /* Brillo especular que recorre las tarjetas al pasar el mouse */
+  .card, .match-card, .award-card, .comp-card{ position:relative; }
+  @media (hover:hover){
+    .card.team-row, .comp-card, .tm-row, .match-card, .award-card, .div-card, .stadium-mini{
+      transition:transform .35s var(--ease-out), box-shadow .35s var(--ease-out), border-color .25s ease; }
+    .card.team-row:hover, .comp-card:hover, .tm-row:hover, .match-card:hover, .award-card:hover, .div-card:hover, .stadium-mini:hover{
+      transform:translateY(-3px); box-shadow:0 20px 40px -18px var(--shadow), var(--glass-hi); }
+  }
+
+  /* ---------- Barra superior de vidrio ---------- */
+  header.topbar{
+    background:linear-gradient(180deg, color-mix(in srgb, var(--bg) 70%, transparent), color-mix(in srgb, var(--bg) 35%, transparent));
+    -webkit-backdrop-filter:blur(22px) saturate(180%); backdrop-filter:blur(22px) saturate(180%);
+    border-bottom:1px solid var(--glass-edge); transition:box-shadow .3s ease, padding .3s var(--ease-out);
+  }
+  header.topbar.scrolled{ box-shadow:0 10px 30px -16px var(--shadow); }
+  header.topbar h1{
+    background:linear-gradient(90deg, var(--text) 30%, var(--accent-strong)); -webkit-background-clip:text; background-clip:text;
+    -webkit-text-fill-color:transparent; animation:titleIn .5s var(--ease-out) both;
+  }
+  header.topbar h1 .count-badge{ -webkit-text-fill-color:#fff; background:var(--grad-primary); box-shadow:var(--glow-primary); }
+  @keyframes titleIn{ from{ opacity:0; transform:translateY(-6px); filter:blur(4px);} to{ opacity:1; transform:none; filter:none;} }
+  header.topbar .back-btn{
+    width:38px; height:38px; padding:0; border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:26px;
+    background:var(--glass-bg); border:1px solid var(--glass-edge); box-shadow:var(--glass-hi);
+    transition:transform .2s var(--ease-spring), background-color .2s ease;
+  }
+  header.topbar .back-btn:active{ transform:scale(.88) translateX(-2px); }
+  header.topbar .icon-btn{
+    background:var(--glass-bg); border:1px solid var(--glass-edge); border-radius:12px; box-shadow:var(--glass-hi);
+    transition:transform .2s var(--ease-spring), box-shadow .2s ease;
+  }
+  @media (hover:hover){ header.topbar .icon-btn:hover, header.topbar .back-btn:hover{ transform:translateY(-1px); box-shadow:0 6px 16px -8px var(--shadow), var(--glass-hi); } }
+
+  /* ---------- Dock inferior flotante ---------- */
+  nav.tabbar{
+    margin:0 10px 10px; padding:6px; border-radius:24px;
+    background:linear-gradient(160deg, color-mix(in srgb, var(--surface-solid) 78%, transparent), color-mix(in srgb, var(--surface-solid) 55%, transparent));
+    -webkit-backdrop-filter:blur(24px) saturate(180%); backdrop-filter:blur(24px) saturate(180%);
+    border:1px solid var(--glass-edge); box-shadow:0 18px 40px -16px var(--shadow), var(--glass-hi); bottom:calc(10px + env(safe-area-inset-bottom));
+  }
+  nav.tabbar .tab-indicator{
+    position:absolute; top:6px; bottom:6px; left:0; width:0; border-radius:18px; z-index:0; pointer-events:none;
+    background:linear-gradient(135deg, color-mix(in srgb, var(--accent) 24%, transparent), color-mix(in srgb, var(--accent) 10%, transparent));
+    border:1px solid color-mix(in srgb, var(--accent) 35%, transparent);
+    box-shadow:0 6px 18px -8px color-mix(in srgb, var(--accent) 70%, transparent), inset 0 1px 0 rgba(255,255,255,.25);
+    transition:transform .5s var(--ease-spring), width .5s var(--ease-out), opacity .3s ease; opacity:0;
+  }
+  nav.tabbar .tab-indicator.ready{ opacity:1; }
+  nav.tabbar button{ position:relative; z-index:1; border-radius:18px; transition:color .3s ease; }
+  nav.tabbar button .ic{ display:inline-block; transition:transform .45s var(--ease-spring), filter .3s ease; filter:grayscale(.55) opacity(.75); }
+  nav.tabbar button.active .ic{ transform:translateY(-2px) scale(1.14); filter:none; }
+  nav.tabbar button.active .ic.bounce{ animation:icBounce .6s var(--ease-spring); }
+  @keyframes icBounce{ 0%{ transform:translateY(0) scale(1);} 40%{ transform:translateY(-7px) scale(1.25) rotate(-6deg);} 100%{ transform:translateY(-2px) scale(1.14);} }
+
+  /* ---------- Botones ---------- */
+  .btn{ position:relative; overflow:hidden; isolation:isolate; border-radius:14px; letter-spacing:.1px; }
+  .btn-primary{ background:var(--grad-primary); color:#fff; box-shadow:var(--glow-primary), inset 0 1px 0 rgba(255,255,255,.3); }
+  .btn-gold{ background:var(--grad-gold); color:#3a2a03; box-shadow:0 10px 24px -8px rgba(198,148,27,.6), inset 0 1px 0 rgba(255,255,255,.45); }
+  .btn-secondary{ background:var(--glass-bg); border:1px solid var(--glass-edge); color:var(--text); box-shadow:var(--glass-hi), 0 4px 14px -8px var(--shadow);
+    -webkit-backdrop-filter:blur(12px); backdrop-filter:blur(12px); }
+  .btn-danger{ background:color-mix(in srgb, var(--danger) 8%, transparent); -webkit-backdrop-filter:blur(12px); backdrop-filter:blur(12px); }
+  .btn-primary::after, .btn-gold::after{
+    content:''; position:absolute; top:0; bottom:0; left:-60%; width:40%; z-index:-1; pointer-events:none;
+    background:linear-gradient(100deg, transparent, rgba(255,255,255,.38), transparent); transform:skewX(-18deg); transition:left .7s var(--ease-out);
+  }
+  @media (hover:hover){
+    .btn:hover:not(:disabled){ transform:translateY(-1px); filter:none; }
+    .btn-primary:hover:not(:disabled)::after, .btn-gold:hover:not(:disabled)::after{ left:130%; }
+    .btn-secondary:hover:not(:disabled){ border-color:color-mix(in srgb, var(--accent) 45%, transparent); }
+  }
+  .btn:active:not(:disabled){ transform:scale(.96); }
+  .rp{ position:absolute; border-radius:50%; pointer-events:none; transform:scale(0); opacity:.35; background:currentColor; z-index:0;
+    animation:rpOut .6s var(--ease-out) forwards; }
+  @keyframes rpOut{ to{ transform:scale(1); opacity:0; } }
+  .batch-btn{ background:var(--glass-bg); border:1px solid var(--glass-edge); border-radius:10px; box-shadow:var(--glass-hi); transition:transform .2s var(--ease-spring); }
+  .batch-btn:active{ transform:scale(.94); }
+
+  /* Segmentos, chips y selectores */
+  .seg{ background:var(--surface-2); border:1px solid var(--glass-edge); border-radius:16px; padding:4px; box-shadow:inset 0 1px 3px rgba(0,0,0,.06);
+    -webkit-backdrop-filter:blur(10px); backdrop-filter:blur(10px); }
+  .seg button{ border-radius:12px; }
+  .seg button.active{ background:var(--glass-strong); color:var(--accent-strong); box-shadow:0 6px 16px -8px var(--shadow), var(--glass-hi); }
+  .chip, .sp-chip, .snd-chip, .pc-chip, .toggle-row button{ background:var(--glass-bg); border-color:var(--glass-edge); -webkit-backdrop-filter:blur(10px); backdrop-filter:blur(10px); }
+  .chip.active, .sp-chip.active, .toggle-row button.active{ background:var(--grad-primary); border-color:transparent; color:#fff; box-shadow:var(--glow-primary); }
+  .pick{ background:var(--glass-bg); border-color:var(--glass-edge); }
+  .pick.selected{ background:color-mix(in srgb, var(--accent) 16%, transparent); border-color:var(--accent); box-shadow:0 0 0 1px var(--accent) inset, 0 8px 18px -10px var(--accent); }
+
+  /* Campos de formulario */
+  .form-group input[type=text], .form-group input[type=number], .form-group select, .form-group input[type=date], .search-wrap input, .assign-row select{
+    background:var(--glass-bg); border:1px solid var(--glass-edge); box-shadow:inset 0 1px 2px rgba(0,0,0,.05); border-radius:12px;
+    -webkit-backdrop-filter:blur(10px); backdrop-filter:blur(10px);
+  }
+  .form-group select option{ background:var(--surface-solid); color:var(--text); }
+  .form-group input:focus, .form-group select:focus, .search-wrap input:focus{
+    border-color:var(--accent); box-shadow:0 0 0 4px color-mix(in srgb, var(--accent) 18%, transparent), 0 8px 20px -12px var(--accent); outline:none; }
+
+  /* ---------- Hojas, overlays y toasts ---------- */
+  .confirm-overlay{ background:rgba(4,14,9,.38); -webkit-backdrop-filter:blur(4px) saturate(120%); backdrop-filter:blur(4px) saturate(120%); animation:ovIn .28s ease both; }
+  .confirm-sheet{
+    position:relative; background:var(--glass-strong); border:1px solid var(--glass-edge); border-bottom:none; border-radius:26px 26px 0 0;
+    box-shadow:0 -20px 50px -20px rgba(0,0,0,.45), var(--glass-hi);
+    -webkit-backdrop-filter:blur(28px) saturate(180%); backdrop-filter:blur(28px) saturate(180%);
+    animation:sheetUp .5s var(--ease-out) both; padding-top:26px;
+  }
+  .confirm-sheet::before{ content:''; position:absolute; top:9px; left:50%; width:42px; height:5px; margin-left:-21px; border-radius:5px; background:color-mix(in srgb, var(--text) 18%, transparent); }
+  .confirm-overlay.static, .confirm-overlay.static .confirm-sheet{ animation:none; }
+  .confirm-overlay.leaving{ animation:ovOut .26s ease forwards; pointer-events:none; }
+  .confirm-overlay.leaving .confirm-sheet{ animation:sheetDown .28s cubic-bezier(.4,0,1,1) forwards; }
+  @keyframes ovIn{ from{ opacity:0; } to{ opacity:1; } }
+  @keyframes ovOut{ from{ opacity:1; } to{ opacity:0; } }
+  @keyframes sheetUp{ from{ transform:translateY(100%); } to{ transform:none; } }
+  @keyframes sheetDown{ from{ transform:none; } to{ transform:translateY(100%); } }
+  .sim-loader-overlay{ background:rgba(4,14,9,.42); -webkit-backdrop-filter:blur(10px); backdrop-filter:blur(10px); }
+  .sim-loader{ background:var(--glass-strong); border:1px solid var(--glass-edge); border-radius:26px; box-shadow:0 30px 60px -20px rgba(0,0,0,.55), var(--glass-hi);
+    -webkit-backdrop-filter:blur(24px) saturate(180%); backdrop-filter:blur(24px) saturate(180%); }
+  .sim-loader-bar{ background:var(--surface-2); }
+  .sim-loader-bar i{ background:var(--grad-primary); box-shadow:0 0 12px var(--accent); position:relative; overflow:hidden; }
+  .sim-loader-bar i::after{ content:''; position:absolute; inset:0; background:linear-gradient(90deg, transparent, rgba(255,255,255,.5), transparent); animation:shimmer 1.2s linear infinite; }
+  @keyframes shimmer{ from{ transform:translateX(-100%);} to{ transform:translateX(100%);} }
+
+  .toast{
+    background:linear-gradient(135deg, rgba(16,35,28,.78), rgba(16,35,28,.62)); color:#fff; border:1px solid rgba(255,255,255,.16);
+    -webkit-backdrop-filter:blur(18px) saturate(180%); backdrop-filter:blur(18px) saturate(180%);
+    border-radius:16px; padding:12px 18px; box-shadow:0 18px 40px -14px rgba(0,0,0,.55), inset 0 1px 0 rgba(255,255,255,.14);
+    bottom:calc(100px + env(safe-area-inset-bottom)); animation:toastIn .45s var(--ease-spring) both; font-weight:500;
+  }
+  .toast.leaving{ animation:toastOut .3s ease forwards; }
+  @keyframes toastIn{ from{ opacity:0; transform:translate(-50%,18px) scale(.9); filter:blur(4px);} to{ opacity:1; transform:translate(-50%,0) scale(1); filter:none;} }
+  @keyframes toastOut{ to{ opacity:0; transform:translate(-50%,10px) scale(.95); filter:blur(3px);} }
+  #scrollTopBtn{ background:var(--grad-primary); border:1px solid rgba(255,255,255,.25); box-shadow:var(--glow-primary), inset 0 1px 0 rgba(255,255,255,.3);
+    bottom:calc(100px + env(safe-area-inset-bottom)); }
+
+  /* ---------- Transiciones entre pantallas ---------- */
+  #app.scr-fwd{ animation:scrFwd .46s var(--ease-out) backwards; }
+  #app.scr-back{ animation:scrBack .46s var(--ease-out) backwards; }
+  #app.scr-tab{ animation:scrTab .42s var(--ease-out) backwards; }
+  #app.scr-sub{ animation:scrSub .3s ease backwards; }
+  @keyframes scrFwd{ from{ opacity:0; transform:translateX(26px); } }
+  @keyframes scrBack{ from{ opacity:0; transform:translateX(-26px); } }
+  @keyframes scrTab{ from{ opacity:0; transform:translateY(12px) scale(.985); } }
+  @keyframes scrSub{ from{ opacity:.25; } }
+  .stg{ animation:stgIn .55s var(--ease-out) backwards; animation-delay:var(--d,0ms); }
+  @keyframes stgIn{ from{ opacity:0; transform:translateY(16px) scale(.98); } }
+  #app .rv{ opacity:0; transform:translateY(22px) scale(.98); transition:opacity .6s var(--ease-out), transform .6s var(--ease-out); }
+  #app .rv.rv-in{ opacity:1; transform:none; }
+  #app.is-entering .mstat .mbar i, #app.is-entering .ps-bar .bar i, #app.is-entering .div-prog i, #app.is-entering .happy-bar i,
+  #app.is-entering .fit-bar i, #app.is-entering .pred-bar i{ animation:barGrow .9s var(--ease-out) backwards; animation-delay:.12s; transform-origin:left center; }
+  @keyframes barGrow{ from{ transform:scaleX(0); } }
+
+  /* ---------- Tablas ---------- */
+  table.standings tbody tr{ transition:background-color .2s ease; }
+  @media (hover:hover){ table.standings tbody tr:hover{ background:color-mix(in srgb, var(--accent) 7%, transparent); } }
+  table.standings tr.pos1 td, table.standings tr.z-camp td{ background:linear-gradient(90deg, color-mix(in srgb, var(--gold) 12%, transparent), transparent 70%); }
+  .fdot, .fs{ box-shadow:inset 0 1px 0 rgba(255,255,255,.25), 0 2px 5px -2px rgba(0,0,0,.35); }
+
+  /* ---------- Banners de copa y campeón ---------- */
+  .cup-banner{ box-shadow:0 18px 40px -18px rgba(0,0,0,.55), inset 0 1px 0 rgba(255,255,255,.25); border-radius:20px; }
+  .cup-banner::after{ content:''; position:absolute; inset:0; pointer-events:none; border-radius:inherit;
+    background:linear-gradient(115deg, transparent 30%, rgba(255,255,255,.18) 45%, transparent 60%); background-size:250% 100%; animation:bannerSheen 6s ease-in-out infinite; }
+  @keyframes bannerSheen{ 0%,60%{ background-position:150% 0; } 100%{ background-position:-60% 0; } }
+  .champion-banner{ background:var(--grad-gold); box-shadow:0 18px 40px -16px rgba(198,148,27,.6), inset 0 1px 0 rgba(255,255,255,.45); position:relative; overflow:hidden; }
+  .motm-card{ border:1px solid color-mix(in srgb, var(--gold) 60%, transparent); background:linear-gradient(135deg, color-mix(in srgb, var(--gold) 18%, transparent), color-mix(in srgb, var(--gold) 4%, transparent));
+    position:relative; overflow:hidden; }
+  .motm-card::after{ content:''; position:absolute; inset:0; background:linear-gradient(110deg, transparent 35%, rgba(255,255,255,.28) 50%, transparent 65%); background-size:250% 100%; animation:bannerSheen 4.5s ease-in-out infinite; pointer-events:none; }
+  .motm-card .em{ animation:trophyFloat 2.6s ease-in-out infinite; }
+  .award-card.big{ border-color:color-mix(in srgb, var(--gold) 65%, transparent); background:linear-gradient(135deg, color-mix(in srgb, var(--gold) 16%, transparent), color-mix(in srgb, var(--gold) 3%, transparent)); }
+  .ps-ovr{ background:var(--grad-primary); box-shadow:var(--glow-primary), inset 0 1px 0 rgba(255,255,255,.3); border-radius:18px; }
+  .rating-badge .rb-num{ background:linear-gradient(180deg, var(--accent-strong), var(--accent)); -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; }
+  .ps-bar .bar, .happy-bar, .div-prog, .fit-bar, .mstat .mbar{ background:var(--surface-2); box-shadow:inset 0 1px 2px rgba(0,0,0,.08); }
+  .ps-bar .bar i, .div-prog i{ background:var(--grad-primary); box-shadow:0 0 10px -2px var(--accent); }
+  .pitch{ border-radius:18px; border:1px solid var(--glass-edge); box-shadow:0 18px 40px -18px rgba(0,0,0,.55), var(--glass-hi); }
+  .dorsal, .pos-badge, .ovr-chip, .lock-chip, .grp-tag, .season-pill, .pred-score, .ps-bio span{ background:var(--surface-2); border:1px solid var(--glass-edge); }
+  .div-badge{ box-shadow:0 8px 18px -8px rgba(0,0,0,.45), inset 0 1px 0 rgba(255,255,255,.3); border-radius:12px; }
+
+  /* =====================================================================
+     Partidos
+     ===================================================================== */
+  /* Tarjeta de partido con los colores de cada club */
+  .match-card{ overflow:hidden; padding:14px 14px 12px; }
+  .match-card::before{
+    content:''; position:absolute; inset:0; pointer-events:none; z-index:0; opacity:.9;
+    background:
+      radial-gradient(120px 90px at 0% 30%, color-mix(in srgb, var(--ca, transparent) 26%, transparent), transparent 70%),
+      radial-gradient(120px 90px at 100% 30%, color-mix(in srgb, var(--cb, transparent) 26%, transparent), transparent 70%);
+  }
+  .match-card::after{
+    content:''; position:absolute; left:0; right:0; top:0; height:3px; pointer-events:none; z-index:0;
+    background:linear-gradient(90deg, var(--ca, transparent), transparent 42%, transparent 58%, var(--cb, transparent)); opacity:.85;
+  }
+  .match-card > *{ position:relative; z-index:1; }
+  .match-card.clasico{ border:1px solid rgba(226,76,58,.55); box-shadow:0 14px 34px -16px rgba(226,76,58,.55), var(--glass-hi); }
+  .clasico-tag{ box-shadow:0 6px 14px -6px rgba(226,76,58,.7); animation:clasicoGlow 2.4s ease-in-out infinite; }
+  @keyframes clasicoGlow{ 0%,100%{ filter:brightness(1);} 50%{ filter:brightness(1.18);} }
+  .match-teams .side img, .match-teams .side svg{ filter:drop-shadow(0 4px 6px rgba(0,0,0,.25)); transition:transform .35s var(--ease-spring); }
+  @media (hover:hover){ .match-teams .side:hover img, .match-teams .side:hover svg{ transform:scale(1.12) rotate(-4deg); } }
+  .match-teams .side.win .tname{ font-weight:800; }
+  .match-teams .side.lose{ opacity:.62; }
+  .vs-box{ min-width:54px; display:flex; align-items:center; justify-content:center; }
+  .vs-box span{ display:inline-flex; align-items:center; justify-content:center; width:40px; height:40px; border-radius:50%; font-family:var(--font-display); font-size:18px; letter-spacing:1px;
+    background:var(--glass-bg); border:1px solid var(--glass-edge); box-shadow:var(--glass-hi), 0 6px 14px -8px var(--shadow); color:var(--text-dim); }
+  .score-box{ cursor:pointer; min-width:70px; padding:4px 10px; border-radius:14px; font-variant-numeric:tabular-nums; letter-spacing:1.5px;
+    background:var(--glass-strong); border:1px solid var(--glass-edge); box-shadow:var(--glass-hi), 0 8px 18px -10px var(--shadow); transition:transform .25s var(--ease-spring); }
+  .score-box:active{ transform:scale(.94); }
+  .mc-venue{ opacity:.85; }
+  .jornada-header{ padding:6px 2px 0; }
+  .jornada-label{ display:inline-flex; align-items:center; gap:8px; }
+  .jornada-label::before{ content:''; width:8px; height:8px; border-radius:50%; background:var(--grad-primary); box-shadow:0 0 0 3px color-mix(in srgb, var(--accent) 18%, transparent); }
+  .bracket-side.winner{ background:linear-gradient(90deg, color-mix(in srgb, var(--accent) 14%, transparent), transparent); border-radius:8px; padding-left:6px; padding-right:6px; }
+
+  /* Marcador estilo transmisión */
+  .scoreboard{
+    position:relative; overflow:hidden; border-radius:24px; padding:16px 14px 18px; isolation:isolate;
+    background:var(--glass-strong); border:1px solid var(--glass-edge);
+    box-shadow:0 24px 50px -24px rgba(0,0,0,.55), var(--glass-hi);
+    -webkit-backdrop-filter:blur(24px) saturate(180%); backdrop-filter:blur(24px) saturate(180%);
+  }
+  .scoreboard > *:not(.goal-fx):not(.sb-glow):not(.sb-flash){ position:relative; z-index:1; }
+  .sb-glow{ position:absolute; inset:-20%; z-index:0; pointer-events:none; opacity:.55;
+    background:
+      radial-gradient(38% 50% at 18% 58%, color-mix(in srgb, var(--ca) 60%, transparent), transparent 70%),
+      radial-gradient(38% 50% at 82% 58%, color-mix(in srgb, var(--cb) 60%, transparent), transparent 70%);
+    animation:sbBreath 7s ease-in-out infinite alternate; }
+  @keyframes sbBreath{ from{ transform:scale(1); opacity:.42; } to{ transform:scale(1.08); opacity:.62; } }
+  .sb-flash{ position:absolute; top:50%; width:340px; height:340px; margin:-170px 0 0 -170px; border-radius:50%; z-index:0; pointer-events:none;
+    background:radial-gradient(circle, var(--fc) 0%, color-mix(in srgb, var(--fc) 40%, transparent) 30%, transparent 65%); animation:sbFlash 1.3s ease-out forwards; }
+  @keyframes sbFlash{ 0%{ opacity:0; transform:scale(.3);} 20%{ opacity:.95;} 100%{ opacity:0; transform:scale(1.6);} }
+  .scoreboard .teams{ gap:10px; }
+  .scoreboard .tside > svg, .scoreboard .tside > img{ filter:drop-shadow(0 8px 12px rgba(0,0,0,.3)); animation:crestFloat 4.5s ease-in-out infinite; transition:filter .5s ease, transform .5s ease; }
+  .scoreboard .tside:last-child > svg, .scoreboard .tside:last-child > img{ animation-delay:-2.2s; }
+  @keyframes crestFloat{ 0%,100%{ transform:translateY(0);} 50%{ transform:translateY(-4px);} }
+  .scoreboard .tside{ transition:opacity .6s ease, filter .6s ease; }
+  .scoreboard .tside.lose{ opacity:.55; filter:saturate(.55); }
+  .scoreboard .tside.win > svg, .scoreboard .tside.win > img{ filter:drop-shadow(0 0 14px color-mix(in srgb, var(--gold) 80%, transparent)) drop-shadow(0 8px 12px rgba(0,0,0,.3)); }
+  .scoreboard .tside.win .tname::after{ content:'🏆'; margin-left:5px; display:inline-block; animation:gfxCrest .8s var(--ease-spring) both; }
+  .scoreboard .score{ font-size:50px; line-height:1; font-variant-numeric:tabular-nums; min-width:34px; text-align:center; text-shadow:0 6px 18px var(--shadow); }
+  .scoreboard .sb-dash{ font-family:var(--font-display); font-size:30px; color:var(--text-dim); opacity:.7; }
+  .matchclock-row{ display:flex; flex-direction:column; align-items:center; gap:4px; }
+  .matchclock{ display:inline-block; padding:2px 16px; border-radius:12px; font-size:30px; background:var(--surface-2); border:1px solid var(--glass-edge); box-shadow:var(--glass-hi); }
+  .phase-label{ letter-spacing:1.4px; }
+  .live-badge{ display:inline-flex; align-items:center; gap:6px; font-size:10.5px; font-weight:800; letter-spacing:1.2px; color:#fff; padding:3px 10px 3px 8px; border-radius:999px;
+    background:linear-gradient(135deg,#FF4D5E,#C81E35); box-shadow:0 6px 16px -6px rgba(214,41,58,.8); }
+  .live-badge i{ width:7px; height:7px; border-radius:50%; background:#fff; animation:liveDot 1.1s ease-in-out infinite; }
+  .live-badge.ended{ background:linear-gradient(135deg,#5B6B63,#3A4741); box-shadow:none; }
+  .live-badge.ended i{ animation:none; opacity:.6; }
+  @keyframes liveDot{ 0%,100%{ opacity:1; transform:scale(1);} 50%{ opacity:.35; transform:scale(.7);} }
+  .scoreboard.tense{ animation:tensePulse 1.8s ease-in-out infinite; }
+  @keyframes tensePulse{ 0%,100%{ box-shadow:0 24px 50px -24px rgba(0,0,0,.55), 0 0 0 0 rgba(214,41,58,0); } 50%{ box-shadow:0 24px 50px -24px rgba(0,0,0,.55), 0 0 0 4px rgba(214,41,58,.35), 0 0 30px rgba(214,41,58,.35); } }
+  .clock-track{ height:5px; background:var(--surface-2); }
+  .clock-track i{ background:var(--grad-primary); box-shadow:0 0 10px var(--accent); }
+  .mom-wrap{ height:8px; opacity:.4; border-radius:8px; }
+  .mom-wrap i{ width:4px; margin-left:-2px; background:#fff; box-shadow:0 0 10px 2px rgba(255,255,255,.8); opacity:1; }
+  .poss-bar{ height:12px; border-radius:999px; border:1px solid var(--glass-edge); box-shadow:inset 0 1px 3px rgba(0,0,0,.15); gap:2px; background:var(--surface-2); }
+  .poss-bar i{ position:relative; overflow:hidden; }
+  .poss-bar i:first-child{ border-radius:999px 0 0 999px; } .poss-bar i:last-child{ border-radius:0 999px 999px 0; }
+  .poss-bar i::after{ content:''; position:absolute; inset:0; background:linear-gradient(180deg, rgba(255,255,255,.35), transparent 60%); }
+  .ls-box{ border-radius:16px; padding:9px 4px; transition:transform .3s var(--ease-spring); }
+  .ls-box .lv{ font-variant-numeric:tabular-nums; }
+  .ls-box.bump{ animation:lsBump .5s var(--ease-spring); }
+  @keyframes lsBump{ 0%{ transform:scale(1);} 40%{ transform:scale(1.08); box-shadow:0 0 0 2px color-mix(in srgb, var(--accent) 45%, transparent), var(--glass-shadow);} 100%{ transform:scale(1);} }
+  .commentary{ border-radius:16px; position:relative; overflow:hidden; padding-left:16px; }
+  .commentary::before{ content:''; position:absolute; left:0; top:0; bottom:0; width:4px; background:var(--grad-primary); }
+  .commentary.flash{ animation:cmFlash .7s var(--ease-out); }
+  @keyframes cmFlash{ 0%{ transform:translateY(4px); box-shadow:0 0 0 2px color-mix(in srgb, var(--accent) 55%, transparent), var(--glass-shadow); } 100%{ transform:none; } }
+  .commentary.flash .cm-tx{ animation:cmText .45s var(--ease-out) both; }
+  @keyframes cmText{ from{ opacity:0; transform:translateX(8px); filter:blur(3px); } }
+  .speed-row{ padding:6px; border-radius:16px; background:var(--surface-2); border:1px solid var(--glass-edge); }
+
+  /* Línea de tiempo de incidencias */
+  .event-row{ position:relative; border-bottom:none; padding:9px 8px 9px 6px; border-radius:14px; margin:2px 0; }
+  .event-row::before{ content:''; position:absolute; left:63px; top:0; bottom:0; width:2px; background:linear-gradient(180deg, transparent, var(--border) 20%, var(--border) 80%, transparent); }
+  .event-row .event-ic{ position:relative; z-index:1; width:28px; height:28px; display:flex; align-items:center; justify-content:center; border-radius:50%; font-size:14px;
+    background:var(--glass-strong); border:1px solid var(--glass-edge); box-shadow:0 4px 10px -6px var(--shadow), 0 0 0 2px var(--tc, transparent); }
+  .event-row .event-min{ font-variant-numeric:tabular-nums; text-align:right; padding-right:2px; }
+  .event-row.big{ background:linear-gradient(90deg, color-mix(in srgb, var(--tc, var(--accent)) 20%, transparent), transparent 75%); border:1px solid color-mix(in srgb, var(--tc, var(--accent)) 25%, transparent); }
+  .event-row.big .event-ic{ box-shadow:0 0 0 2px var(--tc, var(--accent)), 0 0 16px -2px var(--tc, var(--accent)); }
+  .event-row.ev-in{ animation:evIn .5s var(--ease-out) both; }
+  .event-row.ev-in.big{ animation:evInBig .7s var(--ease-spring) both; }
+  @keyframes evIn{ from{ opacity:0; transform:translateX(-16px); filter:blur(3px);} to{ opacity:1; transform:none; filter:none;} }
+  @keyframes evInBig{ 0%{ opacity:0; transform:scale(.9) translateY(10px);} 60%{ opacity:1; transform:scale(1.02);} 100%{ transform:none;} }
+  .half-divider{ display:flex; align-items:center; gap:10px; }
+  .half-divider::before, .half-divider::after{ content:''; flex:1; height:1px; background:linear-gradient(90deg, transparent, var(--border), transparent); }
+
+  /* Overlays de gol con panel de vidrio */
+  .goal-fx .gfx-who{ background:rgba(255,255,255,.14); border:1px solid rgba(255,255,255,.28); border-radius:999px; padding:4px 14px; margin-top:8px;
+    -webkit-backdrop-filter:blur(8px); backdrop-filter:blur(8px); box-shadow:inset 0 1px 0 rgba(255,255,255,.2); }
+  .goal-fx .gfx-title{ text-shadow:0 4px 0 rgba(0,0,0,.2), 0 0 30px rgba(255,255,255,.35); }
+
+  /* ---------- Splash de vidrio ---------- */
+  #splash{ background:radial-gradient(circle at 30% 20%, #23A866 0%, transparent 45%), radial-gradient(circle at 80% 80%, #1C6FB8 0%, transparent 45%), linear-gradient(160deg,#0E4D2B,#06130D); }
+  #splash .splash-badge{ background:rgba(255,255,255,.14); border:1px solid rgba(255,255,255,.3); padding:10px; border-radius:30px;
+    -webkit-backdrop-filter:blur(16px); backdrop-filter:blur(16px); box-shadow:0 20px 50px -14px rgba(0,0,0,.6), inset 0 1px 0 rgba(255,255,255,.35); }
+  #splash .splash-badge img{ border-radius:20px; }
+  #splash .splash-title{ background:linear-gradient(90deg,#fff 20%,#B9F5D3 50%,#fff 80%); background-size:200% 100%; -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent;
+    animation:splashFade .6s ease .28s both, titleShine 2.4s linear .8s infinite; }
+  @keyframes titleShine{ from{ background-position:200% 0; } to{ background-position:-200% 0; } }
+  #splash.splash-out{ transform:scale(1.06); filter:blur(6px); transition:opacity .55s ease, visibility .55s ease, transform .55s ease, filter .55s ease; }
+
+  /* ---------- Modo liviano y accesibilidad ---------- */
+  html.lite-glass .card, html.lite-glass .match-card, html.lite-glass .form-sec, html.lite-glass .bracket-match, html.lite-glass .award-card,
+  html.lite-glass .ls-box, html.lite-glass .commentary, html.lite-glass .team-chip, html.lite-glass .btn-secondary, html.lite-glass .chip,
+  html.lite-glass .seg, html.lite-glass .form-group input, html.lite-glass .form-group select, html.lite-glass .pick{
+    -webkit-backdrop-filter:none; backdrop-filter:none; }
+  html.lite-glass #bgFx i{ animation:none; }
+  @supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){
+    :root{ --surface:rgba(255,255,255,.92); --glass-bg:linear-gradient(135deg, rgba(255,255,255,.95), rgba(255,255,255,.88)); }
+  }
+  @media (prefers-reduced-transparency: reduce){
+    #bgFx{ display:none; }
+    .card, .match-card, .form-sec, .confirm-sheet, .scoreboard, header.topbar, nav.tabbar{ -webkit-backdrop-filter:none; backdrop-filter:none; }
+  }
+  @media (prefers-reduced-motion: reduce){
+    #bgFx i, .sb-glow, .scoreboard .tside > svg, .scoreboard .tside > img, .cup-banner::after, .motm-card::after, .motm-card .em,
+    .clasico-tag, .live-badge i, .sim-loader-bar i::after, header.topbar h1, #splash .splash-title{ animation:none !important; }
+    #app.scr-fwd, #app.scr-back, #app.scr-tab, #app.scr-sub, .stg, .event-row.ev-in, .event-row.ev-in.big, .ls-box.bump,
+    .confirm-overlay, .confirm-sheet, .toast, .sb-flash, nav.tabbar button .ic.bounce, #app.is-entering *{ animation:none !important; }
+    .rv{ opacity:1 !important; transform:none !important; transition:none !important; }
+    .rp{ display:none; }
+    nav.tabbar .tab-indicator{ transition:none; }
+  }
+  .chip, .sp-chip, .seg button, .icon-btn, .batch-btn, .toggle-row button{ position:relative; overflow:hidden; }
+  .search-wrap .si{ z-index:2; }
+  .goal-fx{ border-radius:inherit; }
 </style>
 </head>
 <body>
@@ -1029,6 +1432,7 @@
   <div class="splash-sub">Cargando temporada…</div>
   <div class="splash-track"><i></i></div>
 </div>
+<div id="bgFx" aria-hidden="true"><i class="b1"></i><i class="b2"></i><i class="b3"></i><div class="pitch-lines"></div></div>
 <div id="shell">
   <header class="topbar" id="topbar"></header>
   <main id="app"></main>
@@ -3861,7 +4265,7 @@ function applyTheme(){
   else root.setAttribute('data-theme', ui.theme);
   const dark = ui.theme==='dark' || (ui.theme==='auto' && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches);
   const meta = document.querySelector('meta[name="theme-color"]');
-  if(meta) meta.setAttribute('content', dark ? '#0B1F17' : '#F1FAEE');
+  if(meta) meta.setAttribute('content', dark ? '#06130D' : '#E9F3EE');
 }
 function themeIcon(){ return ui.theme==='auto' ? '🌗' : ui.theme==='dark' ? '🌙' : '☀️'; }
 function themeTitle(){ return 'Tema: '+(ui.theme==='auto'?'automático':ui.theme==='dark'?'oscuro':'claro'); }
@@ -4795,11 +5199,14 @@ const App = {
   closeBoardNotice(){ ui.boardNotice=null; renderOverlay(); },
   acceptFired(){ ui.boardNotice=null; go('dt-home'); },
   toast(msg){
+    const root = el('overlayRoot');
+    const leave = n=>{ if(!n.isConnected || n.classList.contains('leaving')) return; n.classList.add('leaving'); setTimeout(()=>n.remove(), 320); };
+    root.querySelectorAll('.toast').forEach(leave);
     const t = document.createElement('div');
     t.className = 'toast';
     t.textContent = msg;
-    el('overlayRoot').appendChild(t);
-    setTimeout(()=>t.remove(), 2400);
+    root.appendChild(t);
+    setTimeout(()=>leave(t), 2400);
   },
   resetAll(){
     App.askConfirm('Borrar todos los datos', 'Se eliminarán todos los equipos, jugadores y copas guardados en este dispositivo.', ()=>{
@@ -4981,7 +5388,8 @@ function render(){
 }
 function renderTabbar(){
   const bar = el('tabbar');
-  bar.querySelectorAll('button').forEach(b=>{ b.classList.toggle('active', b.dataset.tab===ui.tab); });
+  bar.querySelectorAll('button[data-tab]').forEach(b=>{ b.classList.toggle('active', b.dataset.tab===ui.tab); });
+  uxTabIndicator();
 }
 const BACK_SCREENS = ['team-form','crest-form','stadium-form','team-detail','player-form','comp-form','comp-detail','match-result','league-form','league-detail','bulk-teams','dt-lineup','dt-market','dt-match'];
 function renderTopbar(){
@@ -5060,6 +5468,7 @@ function renderMain(){
   if(ui.screen==='stadium-form'){ updateStadiumPreview(); renderStadiumControls(); }
   if(ui.screen==='match-result' && ui.justSimulated){ animateMatchReveal(); }
   else if(ui.screen==='match-result'){ startPrediction(); }
+  uxAfterRender();
 }
 
 /* ---------- Helpers de UI ---------- */
@@ -6077,13 +6486,15 @@ function renderMatchCard(m, c, isBracket, roundIdx, locked){
   const grp = (!isBracket && m.group!=null && c.groups && c.groups[m.group]) ? `<div class="grp-tag">${esc(c.groups[m.group].name)}</div>` : '';
   const venue = played && m.venue ? m.venue.name : getStadium(A).name;
   const view = `App.viewMatch('${c.id}','${m.id}',${isBracket})`;
-  return `<div class="match-card${clasico?' clasico':''}">
+  const wk = played ? matchWinnerKey(m) : null;
+  const sc = k=> !wk || wk==='d' ? '' : (wk===k ? ' win' : ' lose');
+  return `<div class="match-card${clasico?' clasico':''}" style="--ca:${kitColors(A,null).shirt};--cb:${kitColors(B,A).shirt}">
     ${clasico ? `<div class="clasico-tag">🔥 CLÁSICO</div>` : ''}
     ${grp}
     <div class="match-teams">
-      <div class="side" onclick="App.openTeamFrom('${A.id}')">${teamCrestMini(A.id,c.id+m.id+'a')}<span class="tname">${esc(A.name)}</span></div>
-      ${played ? `<div class="score-box" onclick="${view}">${m.homeGoals} - ${m.awayGoals}</div>` : `<div class="vs-box">VS</div>`}
-      <div class="side right" onclick="App.openTeamFrom('${B.id}')"><span class="tname">${esc(B.name)}</span>${teamCrestMini(B.id,c.id+m.id+'b')}</div>
+      <div class="side${sc('a')}" onclick="App.openTeamFrom('${A.id}')">${teamCrestMini(A.id,c.id+m.id+'a')}<span class="tname">${esc(A.name)}</span></div>
+      ${played ? `<div class="score-box" onclick="${view}">${m.homeGoals} - ${m.awayGoals}</div>` : `<div class="vs-box"><span>VS</span></div>`}
+      <div class="side right${sc('b')}" onclick="App.openTeamFrom('${B.id}')"><span class="tname">${esc(B.name)}</span>${teamCrestMini(B.id,c.id+m.id+'b')}</div>
     </div>
     ${played && m.penA!=null ? `<div class="pen-note">Penales: ${m.penA} - ${m.penB}</div>` : ''}
     <div class="mc-venue">🏟️ ${esc(venue)}</div>
@@ -7130,7 +7541,8 @@ function eventTextHtml(e, A, B){
   return wrap(head(P(e.inId)), 'Entra por '+esc(P(e.outId))+(reason?` · <span class="sub-reason">${esc(reason)}</span>`:''));
 }
 function eventRowHtml(e, A, B){
-  return `<div class="event-row ${e.type==='cambio'?'ev-sub':''}"><div class="event-min">${e.display||formatMinute(e.minute)}</div><div class="event-ic">${iconForEvent(e)}</div>${eventTextHtml(e,A,B)}</div>`;
+  const sa = evSideAttrs(e, A, B);
+  return `<div class="event-row${e.type==='cambio'?' ev-sub':''}${BIG_EVENTS.has(e.type)?' big':''}${sa.cls}"${sa.style}><div class="event-min">${e.display||formatMinute(e.minute)}</div><div class="event-ic">${iconForEvent(e)}</div>${eventTextHtml(e,A,B)}</div>`;
 }
 function motmCardHtml(m){
   const motm = m.motmPlayerId ? findPlayerGlobal(m.motmPlayerId) : null;
@@ -7162,12 +7574,14 @@ function venueLineHTML(c, m, A){
 }
 function scoreboardTop(A,B,scoreH,scoreA,ids){
   ids = ids||{};
-  return `<div class="teams">
-    <div class="tside" onclick="App.openTeamFrom('${A.id}')">${crestSVG(A.crest,54,A.id+'sc')}<div class="tname">${esc(A.name)}</div></div>
+  const cA = kitColors(A,null).shirt, cB = kitColors(B,A).shirt;
+  const wc = k=> !ids.win || ids.win==='d' ? '' : (ids.win===k ? ' win' : ' lose');
+  return `<div class="sb-glow" style="--ca:${cA};--cb:${cB}"></div><div class="teams">
+    <div class="tside${wc('a')}" onclick="App.openTeamFrom('${A.id}')">${crestSVG(A.crest,54,A.id+'sc')}<div class="tname">${esc(A.name)}</div></div>
     <div class="score" ${ids.h?`id="${ids.h}"`:''}>${scoreH}</div>
-    <div style="font-family:var(--font-display);font-size:28px;color:var(--text-dim);">-</div>
+    <div class="sb-dash">-</div>
     <div class="score" ${ids.a?`id="${ids.a}"`:''}>${scoreA}</div>
-    <div class="tside" onclick="App.openTeamFrom('${B.id}')">${crestSVG(B.crest,54,B.id+'sc')}<div class="tname">${esc(B.name)}</div></div>
+    <div class="tside${wc('b')}" onclick="App.openTeamFrom('${B.id}')">${crestSVG(B.crest,54,B.id+'sc')}<div class="tname">${esc(B.name)}</div></div>
   </div>`;
 }
 
@@ -7412,6 +7826,7 @@ function screenMatchResult(){
     return `
       <div class="scoreboard" id="scoreboardBox">
         <div class="matchclock-row">
+          <div class="live-badge" id="liveBadge"><i></i>EN VIVO</div>
           <div class="phase-label" id="matchPhase">PRIMER TIEMPO</div>
           <div class="matchclock" id="matchClock">00:00</div>
           <div class="clock-track"><i id="clockFill"></i></div>
@@ -7481,7 +7896,7 @@ function screenMatchResult(){
   return `
     <div class="scoreboard" id="scoreboardBox">
       <div class="matchclock-row"><div class="phase-label">${m.extraTime?'FINAL TRAS LA PRÓRROGA':'FINAL DEL PARTIDO'}</div><div class="matchclock">${m.extraTime?'120:00'+(sET2?(' +'+sET2+"'"):''):'90:00'+(s2?(' +'+s2+"'"):'')}</div></div>
-      ${scoreboardTop(A,B,m.homeGoals,m.awayGoals)}
+      ${scoreboardTop(A,B,m.homeGoals,m.awayGoals,{win:matchWinnerKey(m)})}
       ${m.penA!=null ? `<div class="pens">Penales: ${m.penA} - ${m.penB}</div>` : ''}
     </div>
     ${careerFinanceBoxHTML(m)}
@@ -7489,6 +7904,10 @@ function screenMatchResult(){
     ${predResultHTML(m,A,B)}
     ${tabs}
     ${body}`;
+}
+function matchWinnerKey(m){
+  if(m.penA!=null) return m.penA>m.penB ? 'a' : 'b';
+  return m.homeGoals>m.awayGoals ? 'a' : m.awayGoals>m.homeGoals ? 'b' : 'd';
 }
 function careerFinanceBoxHTML(m){
   if(!DT.lastFinance || DT.lastFinance.matchId!==m.id) return '';
@@ -8215,6 +8634,12 @@ async function animateMatchReveal(){
     commentary.innerHTML = `<span class="cm-min">${esc(min)}</span><span class="cm-tx">${esc(text)}</span>`;
     commentary.classList.remove('flash'); void commentary.offsetWidth; commentary.classList.add('flash');
   }
+  function setLv(node, v){
+    if(!node || node.textContent===v) return;
+    node.textContent = v;
+    const b = node.parentElement;
+    if(b && !animSkip){ b.classList.remove('bump'); void b.offsetWidth; b.classList.add('bump'); }
+  }
   /* Los contadores crecen de forma proporcional al minuto jugado */
   function updateLive(minute, mom){
     const f = clamp(minute/(m.extraTime?120:90), 0, 1);
@@ -8224,10 +8649,10 @@ async function animateMatchReveal(){
     const ease = Math.pow(f, 0.92);
     const g = (k)=>[Math.round((box.home[k]||0)*ease), Math.round((box.away[k]||0)*ease)];
     const [sh,sa] = g('shots'), [oh,oa] = g('on'), [ch,ca] = g('corners'), [fh,fa] = g('fouls');
-    if(lsShots) lsShots.textContent = sh+' - '+sa;
-    if(lsOn) lsOn.textContent = oh+' - '+oa;
-    if(lsCor) lsCor.textContent = ch+' - '+ca;
-    if(lsFouls) lsFouls.textContent = fh+' - '+fa;
+    setLv(lsShots, sh+' - '+sa);
+    setLv(lsOn, oh+' - '+oa);
+    setLv(lsCor, ch+' - '+ca);
+    setLv(lsFouls, fh+' - '+fa);
     const ph = Math.round(50 + (box.home.possession-50)*Math.min(1, f*1.5));
     if(possH) possH.style.width = ph+'%';
     if(possA) possA.style.width = (100-ph)+'%';
@@ -8243,6 +8668,7 @@ async function animateMatchReveal(){
       const prevH = h, prevA = a;
       if(credit===A.id){ h++; if(scoreHome){ scoreHome.textContent=h; pop(scoreHome); } }
       else { a++; if(scoreAway){ scoreAway.textContent=a; pop(scoreAway); } }
+      sbFlash(credit===A.id ? 'a' : 'b', credit===A.id ? kitColors(A,null).shirt : kitColors(B,A).shirt);
       say(e.display, commentaryFor(e,A,B));
       await playShotCinema('gol', team, e, {isPenalty: e.type==='gol_penal'});
       await playGoalFx(e.type==='autogol' ? (credit===A.id?A:B) : team, e);
@@ -8294,7 +8720,9 @@ async function animateMatchReveal(){
     }
     if(e.mom!=null) updateLive(e.minute, e.mom);
     const row = document.createElement('div');
-    row.className = 'event-row ev-in'+(e.type==='cambio'?' ev-sub':'')+(BIG_EVENTS.has(e.type)?' big':'');
+    const sa = evSideAttrs(e, A, B);
+    row.className = 'event-row ev-in'+(e.type==='cambio'?' ev-sub':'')+(BIG_EVENTS.has(e.type)?' big':'')+sa.cls;
+    if(sa.color) row.style.setProperty('--tc', sa.color);
     row.innerHTML = `<div class="event-min">${e.display}</div><div class="event-ic">${iconForEvent(e)}</div>${eventTextHtml(e,A,B)}`;
     evList.appendChild(row);
     await sleep(380);
@@ -8418,6 +8846,9 @@ async function animateMatchReveal(){
     }
   }
   SFX.amb(false);
+  { const lb = el('liveBadge'); if(lb){ lb.classList.add('ended'); lb.innerHTML = '<i></i>FINAL'; } }
+  { const wk = matchWinnerKey(m), ts = document.querySelectorAll('#scoreboardBox .tside');
+    if(wk!=='d' && ts.length===2){ ts[0].classList.add(wk==='a'?'win':'lose'); ts[1].classList.add(wk==='b'?'win':'lose'); } }
   const skipBtn = el('skipBtn'); if(skipBtn) skipBtn.remove();
   const post = el('postSlot');
   if(post) post.innerHTML = `<div class="btn-row" style="margin-top:4px;">
@@ -8511,9 +8942,33 @@ function champCelebrationHTML(cc){
   </div>`;
 }
 /* ---------- Overlay: confirmaciones y ficha de jugador ---------- */
+function overlayKey(x){
+  const sh = x.querySelector('.confirm-sheet'), h = x.querySelector('h3');
+  return (sh ? sh.className : x.className) + '|' + (h ? h.textContent : '');
+}
 function renderOverlay(){
   const root = el('overlayRoot');
-  root.querySelectorAll('.confirm-overlay').forEach(x=>x.remove());
+  const prev = new Map();
+  root.querySelectorAll('.confirm-overlay').forEach(x=>{
+    if(x.classList.contains('leaving')) return;
+    if(x.classList.contains('sim-loader-overlay')){ x.remove(); return; }
+    prev.set(overlayKey(x), x); x.remove();
+  });
+  const settle = ()=>{
+    const keep = new Set();
+    root.querySelectorAll('.confirm-overlay:not(.leaving):not(.sim-loader-overlay)').forEach(n=>{
+      const k = overlayKey(n);
+      if(prev.has(k)){ n.classList.add('static'); keep.add(k); }
+    });
+    prev.forEach((old, k)=>{
+      if(keep.has(k) || prefersReduced()) return;
+      old.classList.add('leaving'); old.classList.remove('static');
+      old.removeAttribute('id'); old.querySelectorAll('[id]').forEach(n=>n.removeAttribute('id'));
+      old.removeAttribute('onclick'); old.querySelectorAll('[onclick]').forEach(n=>n.removeAttribute('onclick'));
+      root.insertBefore(old, root.firstChild);
+      setTimeout(()=>old.remove(), 300);
+    });
+  };
   let html = '';
   if(ui.champCelebration) html += champCelebrationHTML(ui.champCelebration);
   if(ui.roundSummary) html += roundSummaryHTML(ui.roundSummary);
@@ -8544,6 +8999,7 @@ function renderOverlay(){
     </div>`;
   }
   if(html) root.insertAdjacentHTML('beforeend', html);
+  settle();
 }
 
 /* ---------- Atajados globales: botón atrás y teclado ---------- */
@@ -8589,7 +9045,7 @@ App.scrollTop = function(){
   const btn = el('scrollTopBtn');
   if(btn){ btn.classList.remove('show'); void btn.offsetWidth; }
   window.scrollTo({top:0, behavior: prefersReduced() ? 'auto' : 'smooth'});
-  const a = el('app'); if(a) a.scrollTop = 0;
+  const a = el('app'); if(a){ try{ a.scrollTo({top:0, behavior: prefersReduced() ? 'auto' : 'smooth'}); }catch(e){ a.scrollTop = 0; } }
 };
 (function initScrollTopBtn(){
   const btn = document.getElementById('scrollTopBtn');
@@ -8597,13 +9053,160 @@ App.scrollTop = function(){
   let ticking = false;
   function update(){
     ticking = false;
-    const y = window.scrollY || document.documentElement.scrollTop || 0;
+    const app = el('app');
+    const y = Math.max(window.scrollY || document.documentElement.scrollTop || 0, app ? app.scrollTop : 0);
     const overlayOpen = !!document.querySelector('.confirm-overlay') || !!(el('overlayRoot') && el('overlayRoot').children.length);
     btn.classList.toggle('show', y>360 && !overlayOpen);
   }
-  window.addEventListener('scroll', function(){ if(!ticking){ ticking=true; requestAnimationFrame(update); } }, {passive:true});
+  // La app puede scrollear la ventana o el propio <main>, según el navegador: se escuchan ambos
+  document.addEventListener('scroll', function(){ if(!ticking){ ticking=true; requestAnimationFrame(update); } }, {passive:true, capture:true});
   update();
 })();
+
+/* ====== v11 · Glass UI: transiciones entre pantallas, revelado al scrollear, ripple y dock ====== */
+const UX = { lastSel:null, lastSub:null, navDir:null, io:null, enterT:0, lastTab:null };
+const UX_STG_SEL = ['.card','.match-card','.bracket-match','.form-sec','.award-card','.scoreboard','.seg','.section-title','.jornada-header',
+  '.round-title','.cup-banner','.champion-banner','.motm-card','.pred-line','.venue-card','.venue-line','.finance-card','.live-strip','.commentary',
+  '.speed-row','.poss-bar','.div-card','.divi-editor','.stadium-preview','.crest-preview-wrap','.empty-state','.btn-row','.pitch',
+  '.hist-season','.h2h','.search-wrap','.sort-row','.chip-wrap','.zone-key','.team-head','.rating-badge','.lu-card','.trophy-cabinet'].join(',');
+const UX_COUNT_SEL = '.stat-val, .rb-num, .aw-v, .h2h b, .ps-career b, .tm-score, .div-badge';
+
+/* Pantalla nueva = cambia la pantalla o lo seleccionado; sub-pestaña = solo cambia una pestaña interna */
+function uxAfterRender(){
+  const app = el('app'); if(!app) return;
+  if(UX.io) UX.io.disconnect();
+  const sel = [ui.screen, ui.selectedTeamId, ui.selectedCompId, ui.selectedLeagueId].join('|');
+  const sub = [ui.teamTab, ui.compTab, ui.leagueTab, ui.matchTab, ui.statsScope].join('|');
+  const screenChanged = sel !== UX.lastSel;
+  const subChanged = !screenChanged && sub !== UX.lastSub;
+  UX.lastSel = sel; UX.lastSub = sub;
+  if((!screenChanged && !subChanged) || prefersReduced()) return;
+  const cls = screenChanged ? (UX.navDir==='back' ? 'scr-back' : UX.navDir==='tab' ? 'scr-tab' : 'scr-fwd') : 'scr-sub';
+  const all = ['scr-fwd','scr-back','scr-tab','scr-sub','is-entering'];
+  app.classList.remove(...all);
+  void app.offsetWidth;
+  app.classList.add(cls, 'is-entering');
+  clearTimeout(UX.enterT);
+  UX.enterT = setTimeout(()=>app.classList.remove(...all), 1300);
+  uxStagger(app);
+  uxCountUp(app);
+}
+/* Lo visible entra escalonado; lo que está más abajo aparece al scrollear */
+function uxStagger(app){
+  const vh = window.innerHeight || 800;
+  const nodes = Array.from(app.querySelectorAll(UX_STG_SEL)).filter(n=>{
+    const p = n.parentElement && n.parentElement.closest(UX_STG_SEL);
+    return !(p && app.contains(p));
+  }).slice(0, 160);
+  const canIO = 'IntersectionObserver' in window;
+  if(canIO && !UX.io){
+    UX.io = new IntersectionObserver(entries=>{
+      entries.forEach(en=>{
+        if(!en.isIntersecting) return;
+        const t = en.target; UX.io.unobserve(t);
+        t.classList.add('rv-in');
+        setTimeout(()=>t.classList.remove('rv','rv-in'), 700);
+      });
+    }, {rootMargin:'0px 0px -6% 0px', threshold:0.04});
+  }
+  let k = 0;
+  nodes.forEach(n=>{
+    const top = n.getBoundingClientRect().top;
+    if(top < vh){
+      n.style.setProperty('--d', Math.min(k++, 12)*45+'ms');
+      n.classList.add('stg');
+      n.addEventListener('animationend', function done(ev){ if(ev.target!==n) return; n.classList.remove('stg'); n.removeEventListener('animationend', done); });
+    } else if(canIO){
+      n.classList.add('rv');
+      UX.io.observe(n);
+    }
+  });
+}
+/* Los números grandes cuentan hacia arriba al entrar */
+function uxCountUp(app){
+  const nodes = Array.from(app.querySelectorAll(UX_COUNT_SEL)).slice(0, 40);
+  nodes.forEach(n=>{
+    if(n.children.length) return;
+    const txt = n.textContent.trim();
+    if(!/^\d{1,4}$/.test(txt)) return;
+    const to = Number(txt); if(to<2) return;
+    const t0 = performance.now(), dur = 650 + Math.min(500, to*4);
+    const step = now=>{
+      const f = Math.min(1, (now-t0)/dur), e = 1-Math.pow(1-f, 3);
+      n.textContent = String(Math.round(to*e));
+      if(f<1 && n.isConnected) requestAnimationFrame(step); else n.textContent = txt;
+    };
+    n.textContent = '0';
+    requestAnimationFrame(step);
+  });
+}
+/* Píldora de vidrio que se desliza bajo la pestaña activa del dock */
+function uxTabIndicator(){
+  const bar = el('tabbar'); if(!bar) return;
+  let ind = bar.querySelector('.tab-indicator');
+  if(!ind){ ind = document.createElement('span'); ind.className = 'tab-indicator'; ind.setAttribute('aria-hidden','true'); bar.insertBefore(ind, bar.firstChild); }
+  const act = bar.querySelector('button.active');
+  if(!act || !act.offsetWidth){ ind.classList.remove('ready'); return; }
+  const first = !ind.classList.contains('ready');
+  if(first) ind.style.transition = 'none';
+  ind.style.width = act.offsetWidth+'px';
+  ind.style.transform = 'translateX('+act.offsetLeft+'px)';
+  if(first){ void ind.offsetWidth; ind.style.transition = ''; ind.classList.add('ready'); }
+  if(UX.lastTab!==null && UX.lastTab!==ui.tab && !prefersReduced()){
+    const ic = act.querySelector('.ic');
+    if(ic){ ic.classList.remove('bounce'); void ic.offsetWidth; ic.classList.add('bounce'); }
+  }
+  UX.lastTab = ui.tab;
+}
+window.addEventListener('resize', ()=>requestAnimationFrame(uxTabIndicator), {passive:true});
+/* Dirección de la transición: atrás desliza desde la izquierda, el dock hace un fundido */
+{
+  const back = App.__back;
+  App.__back = function(){ UX.navDir = 'back'; try{ return back.apply(this, arguments); } finally{ UX.navDir = null; } };
+  const setTab = App.setTab;
+  if(typeof setTab==='function') App.setTab = function(){ UX.navDir = 'tab'; try{ return setTab.apply(this, arguments); } finally{ UX.navDir = null; } };
+}
+/* Onda al tocar botones */
+document.addEventListener('pointerdown', e=>{
+  if(prefersReduced()) return;
+  const b = e.target.closest && e.target.closest('.btn, .chip, .sp-chip, .seg button, .icon-btn, .batch-btn, .toggle-row button');
+  if(!b || b.disabled) return;
+  const r = b.getBoundingClientRect(), d = Math.max(r.width, r.height)*2.2;
+  const s = document.createElement('span');
+  s.className = 'rp';
+  s.style.cssText = `width:${d}px;height:${d}px;left:${e.clientX-r.left-d/2}px;top:${e.clientY-r.top-d/2}px`;
+  b.appendChild(s);
+  setTimeout(()=>s.remove(), 650);
+}, {passive:true});
+/* La barra superior gana sombra al scrollear */
+(function(){
+  let ticking = false;
+  const upd = ()=>{ ticking = false; const t = el('topbar'), a = el('app'); if(t) t.classList.toggle('scrolled', Math.max(window.scrollY||0, a ? a.scrollTop : 0) > 6); };
+  document.addEventListener('scroll', ()=>{ if(!ticking){ ticking = true; requestAnimationFrame(upd); } }, {passive:true, capture:true});
+})();
+/* Equipos con poca memoria o pocos núcleos: vidrio sin desenfoque en las tarjetas */
+try{
+  const lowEnd = (navigator.deviceMemory && navigator.deviceMemory<=2) || (navigator.hardwareConcurrency && navigator.hardwareConcurrency<=2);
+  if(lowEnd) document.documentElement.classList.add('lite-glass');
+}catch(e){}
+
+/* Partido: destello del color del club en el marcador cuando entra un gol */
+function sbFlash(sideKey, color){
+  const sb = el('scoreboardBox'); if(!sb || animSkip || prefersReduced()) return;
+  const f = document.createElement('div');
+  f.className = 'sb-flash';
+  f.style.cssText = `left:${sideKey==='a'?'22%':'78%'};--fc:${color}`;
+  sb.appendChild(f);
+  setTimeout(()=>f.remove(), 1400);
+}
+/* Color y lado de cada incidencia para la línea de tiempo */
+function evSideAttrs(e, A, B){
+  const id = e.creditTeamId || e.teamId;
+  const k = id===A.id ? 'home' : id===B.id ? 'away' : (e.side==='home' || e.side==='away') ? e.side : null;
+  if(!k) return {cls:'', style:'', color:''};
+  const c = k==='home' ? kitColors(A,null).shirt : kitColors(B,A).shirt;
+  return {cls:' ev-'+k, style:` style="--tc:${c}"`, color:c};
+}
 
 /* ---------- Inicio ---------- */
 applyTheme();
